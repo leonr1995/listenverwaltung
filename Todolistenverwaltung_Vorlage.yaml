@@ -1,0 +1,218 @@
+openapi: 3.0.1
+info:
+  title: Todo-Listen-Verwaltung
+  description: ""
+  contact:
+    email: wichmann@bbs-os-brinkstr.de
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 0.1.0
+servers:
+- url: http://127.0.0.1:5000/
+tags:
+- name: Listenverwaltung
+paths:
+  /todo-list/{list_id}:
+    get:
+      tags:
+      - Listenverwaltung
+      summary: Liefert alle Einträge einer Todo-Liste zurück
+      operationId: getList
+      parameters:
+      - name: list_id
+        in: path
+        description: list id
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: List item returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TodoEntry'
+        404:
+          description: Invalid list id
+          content: {}
+        500:
+          description: Server error
+          content: {}
+    delete:
+      tags:
+      - Listenverwaltung
+      summary: Löscht eine komplette Todo-Liste mit allen Einträgen
+      operationId: deleteList
+      parameters:
+      - name: list_id
+        in: path
+        description: list id
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: List was deleted
+          content: {}
+        404:
+          description: Invalid list id
+          content: {}
+        500:
+          description: Server error
+          content: {}
+  /todo-list:
+    post:
+      tags:
+      - Listenverwaltung
+      summary: Fügt eine neue Todo-Liste hinzu
+      operationId: addList
+      requestBody:
+        description: list object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TodoList'
+        required: true
+      responses:
+        201:
+          description: List added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TodoList'
+        406:
+          description: Invalid JSON
+          content: {}
+        500:
+          description: List could not be added
+          content: {}
+  /todo-list/{list_id}/entry:
+    post:
+      tags:
+      - Eintragsverwaltung
+      summary: Fügt einen Eintrag zu einer bestehenden Todo-Liste hinzu
+      operationId: addEntry
+      parameters:
+      - name: list_id
+        in: path
+        description: list id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: entry object
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/TodoEntry'
+        required: true
+      responses:
+        201:
+          description: Entry added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TodoEntry'
+        406:
+          description: Invalid JSON
+          content: {}
+        500:
+          description: Entry could not be added
+          content: {}
+  /todo-list/{list_id}/entry/{entry_id}:
+    patch:
+      tags:
+      -  Eintragsverwaltung
+      summary: Aktualisiert einen bestehenden Eintrag
+      operationId: patchEntry
+      parameters:
+      - name: list_id
+        in: path
+        description: list id
+        required: true
+        schema:
+          type: string
+      - name: entry_id
+        in: path
+        description: entry id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: entry object
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/TodoEntry'
+        required: true
+      responses:
+        201:
+          description: Entry patched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TodoEntry'
+        404:
+          description: Invalid ID
+          content: {}
+        406:
+          description: Invalid JSON
+          content: {}
+        500:
+          description: Entry could not be patched
+          content: {}
+    delete:
+      tags:
+      -  Eintragsverwaltung
+      summary: Löscht einen bestehenden Eintrag
+      operationId: deleteEntry
+      parameters:
+      - name: list_id
+        in: path
+        description: list id
+        required: true
+        schema:
+          type: string
+      - name: entry_id
+        in: path
+        description: entry id
+        required: true
+        schema:
+          type: string
+      responses:
+        201:
+          description: Entry deleted
+          content: {}
+        404:
+          description: Invalid ID
+          content: {}
+        500:
+          description: Entry could not be deleted
+          content: {}
+            
+components:
+  schemas:
+    TodoList:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+    TodoEntry:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        list_id:
+          type: string
+          format: uuid
